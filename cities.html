@@ -1,0 +1,130 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <script src="js/angular.min.js"></script>
+        <script>
+            var app = angular.module("myApp" ,[]);
+                      app.controller("myController" ,function($scope ,$http){
+                         $http.get('https://citydetails-c4769.firebaseio.com/cities.json').then(function(res){
+                             $scope.cities = res.data;
+                             console.log(JSON.stringify(res));
+                         }) 
+                         
+                         .catch(function(err){
+                             console.log("The error is " ,err);
+                         })
+                          
+                         $scope.addData = function(){
+                             console.log("Form values are " ,$scope.city);
+                             
+                             $http.post('https://citydetails-c4769.firebaseio.com/cities.json' ,$scope.city).then(function(res){
+                                 $scope.cities = res.data;
+                                 console.log(JSON.stringify(res));
+                             })
+                             
+                             .catch(function(err){
+                                 console.log("Error is ",err);
+                             })
+                         } 
+                         
+                         
+                         $scope.updateCity = function(){
+                             $http.put('https://citydetails-c4769.firebaseio.com/cities/' + $scope.key + ".json" , $scope.city).then(function(res){
+                                 $scope.city = {};
+                                 $scope.btn_str = true;
+                                 $scope.cities =res.data;
+                             })
+                             
+                             .catch(function(res){
+                                 console.log(err);
+                             })
+                         }
+                         
+                         
+                         $scope.removeData = function(key){
+                             $http.delete('https://citydetails-c4769.firebaseio.com/cities/' + key + ".json" ,$scope.city).then(function(res){
+                                 $scope.cities = res.data;
+                             })
+                             
+                             .catch(function(res){
+                                 console.log(err);
+                             })
+                         }
+                         
+                         $scope.btn_str = true;
+                         $scope.editData = function(key ,city){
+                             $scope.city = city;
+                             $scope.key = key;
+                             $scope.btn_str = false;
+                         }
+                      });
+        </script>
+    </head>
+    
+    <body ng-app="myApp" ng-controller="myController">
+        <!--{{cities}}-->
+        
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-4">
+                    <h1 class="text-center">Add City Details</h1>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input ng-model="city.name" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Pic</label>
+                        <input ng-model="city.pic" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Population</label>
+                        <input ng-model="city.population" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Collector</label>
+                        <input ng-model="city.collector" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>SP</label>
+                        <input ng-model="city.SP" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <button ng-if="btn_str" class="btn btn-primary" ng-click="addData()">Save</button>
+                        <button ng-if="!btn_str" class="btn btn-info" ng-click="updateCity()">Update</button>
+                    </div>
+                    
+                </div>
+                
+                <div class="col-sm-8">
+                    <table class="table table-hover table-bordered">
+                        <tr>
+                            <th>Name</th>
+                            <th>Pic</th>
+                            <th>Population</th>
+                            <th>Collector</th>
+                            <th>SP</th>
+                            <th>Action</th>
+                        </tr>
+
+                        <tr ng-repeat="(key ,details) in cities">
+                            <td>{{details.name}}</td>
+                            <td><img src="{{details.pic}}" width="100" height="100"></td>
+                            <td>{{details.population}}</td>
+                            <td>{{details.collector}}</td>
+                            <td>{{details.SP}}</td>
+                            <td><button class="btn btn-danger" ng-click="removeData(key)">Delete</button></td>
+                            <td><button class="btn btn-primary" ng-click="editData(key ,details)">Edit</button></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </body>
+    
+</html>
